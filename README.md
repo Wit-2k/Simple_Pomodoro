@@ -8,7 +8,7 @@
 - **自动流转**：工作结束自动进入休息，休息结束自动回到工作。
 
 ## 📸 截图
-![本仓库](Screenshots/demo.png)
+![屏幕截图](Screenshots/demo.png)
 
 ## 🛠️ 开发环境
 - Visual Studio 2022
@@ -16,7 +16,7 @@
 - Windows Forms
 
 ## 🚀 如何使用
-1. 在 [Releases](你的仓库Releases链接) 页面下载最新版 exe。
+1. 在 [Releases](https://github.com/Wit-2k/Simple_Pomodoro/releases/) 页面下载最新版 exe。
 2. 双击运行即可。
 
 ## 📄 License
