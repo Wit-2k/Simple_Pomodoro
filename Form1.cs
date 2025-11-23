@@ -12,14 +12,9 @@ namespace WindowsFormsApp1
             MaximizeBox = false; // 禁止最大化            
         }
 
-        // 调试用
-        private const int TIME_WORK = 1500;
-        private const int TIME_SHORT_BREAK = 12;
-        private const int TIME_LONG_BREAK = 15;
-
-        //private const int TIME_WORK = 25 * 60; // 工作时间25分钟
-        //private const int TIME_SHORT_BREAK = 5 * 60; // 短休息时间5分钟
-        //private const int TIME_LONG_BREAK = 15 * 60; // 长休息时间15分钟
+        private const int TIME_WORK = 25 * 60; // 工作时间25分钟
+        private const int TIME_SHORT_BREAK = 5 * 60; // 短休息时间5分钟
+        private const int TIME_LONG_BREAK = 15 * 60; // 长休息时间15分钟
 
         private enum PomodoroMode
         {
@@ -180,3 +175,4 @@ namespace WindowsFormsApp1
         }
     }
 }
+
