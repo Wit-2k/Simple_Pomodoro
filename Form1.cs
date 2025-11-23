@@ -12,9 +12,15 @@ namespace WindowsFormsApp1
             MaximizeBox = false; // 禁止最大化            
         }
 
-        private const int TIME_WORK = 1 * 60; // 工作时间25分钟
-        private const int TIME_SHORT_BREAK = 1 * 60; // 短休息时间5分钟
-        private const int TIME_LONG_BREAK = 1 * 60; // 长休息时间15分钟
+        // 调试用
+        private const int TIME_WORK = 1500;
+        private const int TIME_SHORT_BREAK = 12;
+        private const int TIME_LONG_BREAK = 15;
+
+        //private const int TIME_WORK = 25 * 60; // 工作时间25分钟
+        //private const int TIME_SHORT_BREAK = 5 * 60; // 短休息时间5分钟
+        //private const int TIME_LONG_BREAK = 15 * 60; // 长休息时间15分钟
+
         private enum PomodoroMode
         {
             Work,
@@ -65,7 +71,12 @@ namespace WindowsFormsApp1
 
         private void btnReset_Click(object sender, EventArgs e)
         {
-            ResetTimer();
+            if (timerState == TimerState.Stopped)
+            {
+                return; // 已停止状态下点击重置无效
+            }
+
+            SwitchMode(currentMode); // 重置模式，刷新标签内容
         }
 
         private void tmrMain_Tick(object sender, EventArgs e)
@@ -152,7 +163,7 @@ namespace WindowsFormsApp1
         {
             breakMode = PomodoroMode.ShortBreak;
 
-            if (timerState == TimerState.Stopped)
+            if (timerState == TimerState.Stopped && currentMode != PomodoroMode.Work)
             {
                 SwitchMode(PomodoroMode.ShortBreak);
             }
@@ -162,7 +173,7 @@ namespace WindowsFormsApp1
         {
             breakMode = PomodoroMode.LongBreak;
 
-            if (timerState == TimerState.Stopped)
+            if (timerState == TimerState.Stopped && currentMode != PomodoroMode.Work)
             {
                 SwitchMode(PomodoroMode.LongBreak);
             }
