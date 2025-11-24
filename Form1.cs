@@ -2,7 +2,6 @@ using System;
 using System.Windows.Forms;
 
 // TODO：自定义工作时间和休息时间
-// TODO：增加系统托盘图标
 // TODO：退出程序前提示今天完成的番茄钟数量
 
 namespace WindowsFormsApp1
@@ -12,16 +11,15 @@ namespace WindowsFormsApp1
         #region 1. 常量、变量
 
         // 调试用
-        //private const int TIME_WORK = 10;
-        //private const int TIME_SHORT_BREAK = 12;
-        //private const int TIME_LONG_BREAK = 15;
+        private const int TIME_WORK = 10;
+        private const int TIME_SHORT_BREAK = 12;
+        private const int TIME_LONG_BREAK = 15;
 
-        private const int TIME_WORK = 25 * 60; // 工作时间25分钟
-        private const int TIME_SHORT_BREAK = 5 * 60; // 短休息时间5分钟
-        private const int TIME_LONG_BREAK = 15 * 60; // 长休息时间15分钟
+        //private const int TIME_WORK = 25 * 60; // 工作时间25分钟
+        //private const int TIME_SHORT_BREAK = 5 * 60; // 短休息时间5分钟
+        //private const int TIME_LONG_BREAK = 15 * 60; // 长休息时间15分钟
 
         private int totalSeconds = TIME_WORK;
-        private int currentSeconds; // 剩余时间
 
         private enum PomodoroMode // 番茄钟模式决定 totalSeconds 变量的值
         {
@@ -41,6 +39,12 @@ namespace WindowsFormsApp1
         }
 
         private TimerState timerState = TimerState.Stopped;
+
+        private TimeSpan remainingTime; // 暂停时记录剩余时间
+        private TimeSpan totalDuration; // 记录总时间用于计算进度
+        private DateTime endTime; // 记录结束时间用于显示倒计时
+
+        private const int PGB_MAX = 10000;
 
         #endregion
 
@@ -68,10 +72,11 @@ namespace WindowsFormsApp1
         {
             tmrMain.Stop();
             timerState = TimerState.Stopped;
-            currentSeconds = totalSeconds;
+            totalDuration = TimeSpan.FromSeconds(totalSeconds);
+            remainingTime = totalDuration;
 
-            pgbTimer.Maximum = totalSeconds;
-            pgbTimer.Value = totalSeconds;
+            pgbTimer.Maximum = PGB_MAX;
+            pgbTimer.Value = PGB_MAX;
 
             btnStartPause.Text = "开始";
             RefreshLabel();
@@ -79,7 +84,7 @@ namespace WindowsFormsApp1
 
         private void RefreshLabel()  // 刷新时间标签，主要由定时器触发
         {
-            lblTime.Text = string.Format("{0:D2}:{1:D2}", currentSeconds / 60, currentSeconds % 60);
+            lblTime.Text = string.Format("{0:D2}:{1:D2}", totalSeconds / 60, totalSeconds % 60);
         }
 
         private void SwitchMode(PomodoroMode newMode)
@@ -123,20 +128,37 @@ namespace WindowsFormsApp1
         /// </summary>
         private void tmrMain_Tick(object sender, EventArgs e)
         {
-            if (currentSeconds > 0) // 该部分每秒执行一次
+            TimeSpan timeLeft = endTime - DateTime.Now; // 触发频率100Hz
+
+            if (timeLeft.TotalMilliseconds > 0)
             {
-                currentSeconds--;
-                RefreshLabel();
-                if (currentSeconds <= pgbTimer.Maximum)
+                lblTime.Text = string.Format("{0:D2}:{1:D2}",
+                    timeLeft.Minutes, timeLeft.Seconds);
+
+                double percent = timeLeft.TotalMilliseconds / totalDuration.TotalMilliseconds;
+
+                int newValue = (int)(percent * PGB_MAX);
+
+                // 边界检查
+                if (newValue < 0)
                 {
-                    pgbTimer.Value = currentSeconds; // 更新进度条
+                    newValue = 0;
                 }
+                else if (newValue > PGB_MAX)
+                {
+                    newValue = PGB_MAX;
+                }
+
+                pgbTimer.Value = newValue;
             }
             else // 时间到
             {
                 tmrMain.Stop();
                 timerState = TimerState.Stopped;
                 btnStartPause.Text = "开始"; // 立即更新提示文本，避免轮询
+
+                lblTime.Text = "00:00";
+                pgbTimer.Value = 0;
 
                 if (currentMode == PomodoroMode.Work) // 一段工作时间结束
                 {
@@ -164,10 +186,11 @@ namespace WindowsFormsApp1
                 timerState = TimerState.Paused;
                 btnStartPause.Text = "继续"; // 定时器等待继续
                 lblStatus.Text = "已暂停";
+
+                remainingTime = endTime - DateTime.Now; // 记录剩余时间
             }
             else
             {
-                tmrMain.Start();
                 timerState = TimerState.Running;
                 btnStartPause.Text = "暂停"; // 定时器等待暂停
                 switch (currentMode)
@@ -179,6 +202,9 @@ namespace WindowsFormsApp1
                         lblStatus.Text = "休息中...";
                         break;
                 }
+
+                endTime = DateTime.Now.Add(remainingTime); // 刷新结束时间
+                tmrMain.Start();
             }
         }
 
@@ -215,7 +241,38 @@ namespace WindowsFormsApp1
             lblCurrentTime.Text = DateTime.Now.ToString("HH:mm:ss");
         }
 
-        #endregion
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // 点击X或按Alt+F4时隐藏窗口到系统托盘
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true; // 取消关闭事件
+                this.Hide();
+            }
+        }
 
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ShowMainWindow();
+        }
+
+        private void tsmiShow_Click(object sender, EventArgs e)
+        {
+            ShowMainWindow();
+        }
+
+        private void tsmiExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void ShowMainWindow()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
+        }
+
+        #endregion
     }
 }

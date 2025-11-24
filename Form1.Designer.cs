@@ -32,6 +32,7 @@ namespace WindowsFormsApp1
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.lblStatus = new System.Windows.Forms.Label();
             this.lblTime = new System.Windows.Forms.Label();
             this.btnStartPause = new System.Windows.Forms.Button();
@@ -42,6 +43,11 @@ namespace WindowsFormsApp1
             this.lblCurrentTime = new System.Windows.Forms.Label();
             this.tmrClock = new System.Windows.Forms.Timer(this.components);
             this.pgbTimer = new System.Windows.Forms.ProgressBar();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.cmsTray = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsmiShow = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmsTray.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblStatus
@@ -115,7 +121,7 @@ namespace WindowsFormsApp1
             // tmrMain
             // 
             this.tmrMain.Enabled = true;
-            this.tmrMain.Interval = 1000;
+            this.tmrMain.Interval = 10;
             this.tmrMain.Tick += new System.EventHandler(this.tmrMain_Tick);
             // 
             // lblCurrentTime
@@ -141,11 +147,43 @@ namespace WindowsFormsApp1
             this.pgbTimer.Size = new System.Drawing.Size(1249, 10);
             this.pgbTimer.TabIndex = 6;
             // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.ContextMenuStrip = this.cmsTray;
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "简易番茄钟";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
+            // 
+            // cmsTray
+            // 
+            this.cmsTray.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.cmsTray.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiShow,
+            this.tsmiExit});
+            this.cmsTray.Name = "cmsTray";
+            this.cmsTray.Size = new System.Drawing.Size(153, 64);
+            // 
+            // tsmiShow
+            // 
+            this.tsmiShow.Name = "tsmiShow";
+            this.tsmiShow.Size = new System.Drawing.Size(152, 30);
+            this.tsmiShow.Text = "显示窗口";
+            this.tsmiShow.Click += new System.EventHandler(this.tsmiShow_Click);
+            // 
+            // tsmiExit
+            // 
+            this.tsmiExit.Name = "tsmiExit";
+            this.tsmiExit.Size = new System.Drawing.Size(152, 30);
+            this.tsmiExit.Text = "退出程序";
+            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1468, 904);
+            this.ContextMenuStrip = this.cmsTray;
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblTime);
             this.Controls.Add(this.btnStartPause);
@@ -156,7 +194,9 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.pgbTimer);
             this.Name = "Form1";
             this.Text = "简易番茄钟";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.cmsTray.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -174,6 +214,10 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.Label lblCurrentTime;
         private System.Windows.Forms.Timer tmrClock;
         private System.Windows.Forms.ProgressBar pgbTimer;
+        private NotifyIcon notifyIcon1;
+        private ContextMenuStrip cmsTray;
+        private ToolStripMenuItem tsmiShow;
+        private ToolStripMenuItem tsmiExit;
     }
 }
 
